@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, session, request
 from data import queries
 import math
 from dotenv import load_dotenv
@@ -7,6 +7,9 @@ load_dotenv()
 app = Flask('codecool_series')
 SHOWS_PER_PAGE = 15
 SHOWN_PAGE_NUMBERS = 5 # should be odd to have a symmetry in pagination
+app.secret_key = 'super secret key'
+app.config["SESSION_PERMANENT"] = True
+
 
 @app.route('/')
 def index():
@@ -14,18 +17,44 @@ def index():
     return render_template('index.html', shows=shows)
 
 
+
 @app.route('/design')
 def design():
     return render_template('design.html')
 
+@app.route("/api-get", methods=["POST"])
+def get_data():
+    rating_limit = request.get_json()["rating_limit"]
+    if (rating_limit != None):
+        session["rating_limit"] = int(rating_limit)
+        print(rating_limit)
 
-@app.route('/shows/')
+    print(session)
+
+    return {"rating_limit": int(rating_limit)}
+
+
+@app.route('/shows-season/')
+def shows_season():
+    print(session)
+    if (session.get("rating_limit") != None):
+        print(session)
+        rating_limit = session.get("rating_limit")
+    else:
+        rating_limit = 0
+    shows = queries.get_shows_limited_where("rating", "DESC", 0, 0, rating_limit)
+    #print(shows)
+    return render_template('index.html', shows=shows)
+
+
+
 @app.route('/shows/<int:page_number>')
 @app.route('/shows/most-rated/')
 @app.route('/shows/most-rated/<int:page_number>')
 @app.route('/shows/order-by-<order_by>/')
 @app.route('/shows/order-by-<order_by>-<order>/')
 @app.route('/shows/order-by-<order_by>/<int:page_number>')
+
 @app.route('/shows/order-by-<order_by>-<order>/<int:page_number>')
 def shows(page_number=1, order_by="rating", order="DESC"):
     count = queries.get_show_count()
@@ -76,7 +105,7 @@ def show(id):
 
 
 def main():
-    app.run(debug=False)
+    app.run(debug=True)
 
 
 if __name__ == '__main__':

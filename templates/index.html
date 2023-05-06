@@ -1,6 +1,11 @@
 {% extends 'layout.html' %}
 {% block title %}Codecool Series Database{% endblock %}
 {% block content %}
+
+
+
+
+
 <h1 class="title text-center">Welcome page</h1>
 <div class="card">
     <h2>Welcome TV show lovers!</h2>
@@ -13,12 +18,20 @@
     </p>
 </div>
 <div class="card">
-    <ul>
+    <table>
         {% for show in shows %}
-        <li>
-            <a href="{{ '/show/' + (show['id'] | string) }}">{{ show['title'] }}</a>
-        </li>
+        <tr>
+            <td>
+                <a href="{{ '/show/' + (show['id'] | string) }}">{{ show['title'] }}</a>
+            </td>
+            <td>
+                "{{ show['rating'] }}"
+            </td>
+            <td>
+                "{{ show['overview']}}"
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
+</table>
 </div>
 {% endblock %}

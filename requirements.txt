@@ -3,3 +3,4 @@ psycopg2-binary
 requests==2.19.1
 python-dotenv==0.13.0
 psycopg
+Flask-Session

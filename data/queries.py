@@ -37,6 +37,19 @@ def get_shows_limited(order_by="rating", order="DESC", limit=0, offset=0):
    )
 
 
+def get_shows_limited_where(order_by="rating", order="DESC", limit=0, offset=0, rating_limit=0):
+    return data_manager.execute_select(
+        sql.SQL("""
+        SELECT final_show.title, final_show.rating, final_season.overview, final_season.season_number
+            FROM shows final_show
+            JOIN seasons final_season ON final_show.id = final_season.show_id AND final_season.season_number = 3
+			AND final_show.rating > %(rating_limit)s
+            ORDER BY final_show.rating
+        """
+        ).format(order_by=sql.Identifier(order_by)),
+        {"order": order, "limit": limit, "offset": offset, "rating_limit": rating_limit}
+   )
+
 def get_show(id):
     return data_manager.execute_select("""
         SELECT
